@@ -309,7 +309,18 @@ export const renewalRequests = pgTable("renewal_requests", {
   notes: text("notes"),
 });
 
+// Temp Uploads Table - Stores individual file uploads before form submission
+export const tempUploads = pgTable("temp_uploads", {
+  id: serial("id").primaryKey(),
+  sessionToken: text("session_token").notNull(),
+  fieldName: text("field_name").notNull(),
+  fileData: text("file_data").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // Types
+export type TempUpload = typeof tempUploads.$inferSelect;
+export type NewTempUpload = typeof tempUploads.$inferInsert;
 export type AdminUser = typeof adminUsers.$inferSelect;
 export type NewAdminUser = typeof adminUsers.$inferInsert;
 export type User = typeof users.$inferSelect;

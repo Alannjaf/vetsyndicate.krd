@@ -1,10 +1,16 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
+import { v4 as uuidv4 } from "uuid";
 import SignatureCanvas from "@/components/SignatureCanvas";
 import DatePicker from "@/components/DatePicker";
 import ImageCropModal from "@/components/ImageCropModal";
 import MultiFileUpload from "@/components/MultiFileUpload";
+
+interface FileEntry {
+  base64: string;
+  uploadId: number;
+}
 
 interface City {
   id: number;
@@ -82,6 +88,10 @@ export default function VetApplicationForm({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const photoInputRef = useRef<HTMLInputElement>(null);
+  const [photoUploading, setPhotoUploading] = useState(false);
+
+  // Session token for grouping temp uploads
+  const sessionToken = useMemo(() => uuidv4(), []);
 
   const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
 
@@ -95,16 +105,21 @@ export default function VetApplicationForm({
     return [{ degreeName: "", universityName: "", graduationYear: "" }];
   });
 
-  // Helper: parse a stored value into string[] (backward compat with single strings)
-  const parseDocArray = (val: string | null | undefined): string[] => {
-    if (!val) return [];
-    try {
-      const parsed = JSON.parse(val);
-      if (Array.isArray(parsed)) return parsed;
-    } catch {}
-    // Legacy single-string format
-    return val ? [val] : [];
-  };
+  // Track photo upload ID (for temp upload)
+  const [photoUploadId, setPhotoUploadId] = useState<number | null>(null);
+
+  // Document fields now store FileEntry[] (base64 for thumbnail + server upload ID)
+  const [docFiles, setDocFiles] = useState<{
+    collegeCertificateBase64: FileEntry[];
+    nationalIdCardBase64: FileEntry[];
+    infoCardBase64: FileEntry[];
+    recommendationLetterBase64: FileEntry[];
+  }>({
+    collegeCertificateBase64: [],
+    nationalIdCardBase64: [],
+    infoCardBase64: [],
+    recommendationLetterBase64: [],
+  });
 
   const [formData, setFormData] = useState({
     // Personal Info
@@ -119,7 +134,6 @@ export default function VetApplicationForm({
     bloodType: initialData?.bloodType || "",
     // Education & Work
     scientificRank: initialData?.scientificRank || "",
-    collegeCertificateBase64: parseDocArray(initialData?.collegeCertificateBase64),
     jobLocation: initialData?.jobLocation || "",
     yearOfEmployment: initialData?.yearOfEmployment || "",
     privateWorkDetails: initialData?.privateWorkDetails || "",
@@ -128,11 +142,8 @@ export default function VetApplicationForm({
     phoneNumber: initialData?.phoneNumber || "",
     emailAddress: initialData?.emailAddress || "",
     cityId: initialData?.cityId?.toString() || preselectedCityId?.toString() || "",
-    // Files (base64) - documents are arrays, photo stays single
+    // Photo stays as single base64 for display
     photoBase64: initialData?.photoBase64 || "",
-    nationalIdCardBase64: parseDocArray(initialData?.nationalIdCardBase64),
-    infoCardBase64: parseDocArray(initialData?.infoCardBase64),
-    recommendationLetterBase64: parseDocArray(initialData?.recommendationLetterBase64),
     // Verification
     signatureBase64: initialData?.signatureBase64 || "",
     confirmationChecked: initialData?.confirmationChecked || false,
@@ -196,6 +207,33 @@ export default function VetApplicationForm({
     setUniversityDegrees(updated);
   };
 
+  // Upload photo to temp storage after cropping
+  const uploadPhotoToTemp = async (base64: string) => {
+    setPhotoUploading(true);
+    try {
+      // Delete previous photo upload if any
+      if (photoUploadId) {
+        fetch(
+          `/api/temp-uploads?id=${photoUploadId}&sessionToken=${encodeURIComponent(sessionToken)}`,
+          { method: "DELETE" }
+        ).catch(() => {});
+      }
+      const res = await fetch("/api/temp-uploads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionToken, fieldName: "photoBase64", fileData: base64 }),
+      });
+      if (res.ok) {
+        const { id } = await res.json();
+        setPhotoUploadId(id);
+      }
+    } catch (err) {
+      console.error("Photo upload error:", err);
+    } finally {
+      setPhotoUploading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -222,26 +260,20 @@ export default function VetApplicationForm({
       return;
     }
 
-    if (formData.collegeCertificateBase64.length === 0) {
+    if (docFiles.collegeCertificateBase64.length === 0) {
       setError("Please upload the college certificate / تکایە بڕوانامە باربکە");
       setSubmitting(false);
       return;
     }
 
-    if (formData.nationalIdCardBase64.length === 0) {
+    if (docFiles.nationalIdCardBase64.length === 0) {
       setError("Please upload the National ID Card / تکایە کارتی نیشتیمانی باربکە");
       setSubmitting(false);
       return;
     }
 
-    if (formData.infoCardBase64.length === 0) {
+    if (docFiles.infoCardBase64.length === 0) {
       setError("Please upload the Information Card / تکایە کارتی زانیاری باربکە");
-      setSubmitting(false);
-      return;
-    }
-
-    if (formData.recommendationLetterBase64.length === 0) {
-      setError("Please upload the Recommendation Letter / تکایە پاڵێنامە باربکە");
       setSubmitting(false);
       return;
     }
@@ -271,25 +303,17 @@ export default function VetApplicationForm({
         : "/api/vet-applications";
       const method = isEditMode ? "PUT" : "POST";
 
+      // Submit lightweight payload — files are already in temp_uploads
       const payload = JSON.stringify({
         ...formData,
         cityId: parseInt(formData.cityId),
         universityDegrees: JSON.stringify(universityDegrees),
-        // Serialize document arrays to JSON strings for storage
-        collegeCertificateBase64: JSON.stringify(formData.collegeCertificateBase64),
-        nationalIdCardBase64: JSON.stringify(formData.nationalIdCardBase64),
-        infoCardBase64: JSON.stringify(formData.infoCardBase64),
-        recommendationLetterBase64: JSON.stringify(formData.recommendationLetterBase64),
+        // Send session token so server resolves files from temp_uploads
+        uploadSessionToken: sessionToken,
+        // Signature stays inline (it's tiny canvas data)
+        signatureBase64: formData.signatureBase64,
         sendEmail: isAdminMode ? formData.sendEmail : true,
       });
-
-      // Pre-submission size check (Netlify ~3.5MB effective limit for JSON payloads)
-      const payloadSizeMB = new Blob([payload]).size / (1024 * 1024);
-      if (payloadSizeMB > 4.5) {
-        throw new Error(
-          "The uploaded files are too large. Please use smaller or fewer images and try again. / فایلەکان زۆر گەورەن. تکایە وێنەی بچووکتر بەکاربهێنە و دووبارە هەوڵ بدەرەوە."
-        );
-      }
 
       const response = await fetch(url, {
         method,
@@ -305,7 +329,7 @@ export default function VetApplicationForm({
       } catch {
         if (!response.ok) {
           throw new Error(
-            "The uploaded files are too large for the server. Please use smaller or fewer images and try again. / فایلەکان زۆر گەورەن. تکایە وێنەی بچووکتر بەکاربهێنە و دووبارە هەوڵ بدەرەوە."
+            `Failed to ${isEditMode ? "update" : "submit"} application`
           );
         }
         throw new Error(`Failed to ${isEditMode ? "update" : "submit"} application`);
@@ -320,7 +344,13 @@ export default function VetApplicationForm({
         onSuccess(result.trackingToken, result.id);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      if (err instanceof TypeError && err.message === "Failed to fetch") {
+        setError(
+          "Failed to submit — there may be a network issue. Please try again. / ناردن سەرکەوتوو نەبوو — لەوانەیە کێشەی تۆڕ هەیە. تکایە دووبارە هەوڵ بدەرەوە."
+        );
+      } else {
+        setError(err instanceof Error ? err.message : "An error occurred");
+      }
     } finally {
       setSubmitting(false);
     }
@@ -379,13 +409,21 @@ export default function VetApplicationForm({
                   <span dir="rtl">وێنە *</span>
                   <span className="block text-xs text-gray-500">Photo</span>
                 </label>
-                <div className="w-28 h-36 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden">
+                <div className="w-28 h-36 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden relative">
                   {formData.photoBase64 ? (
                     <img src={formData.photoBase64} alt="Photo" className="w-full h-full object-cover" />
                   ) : (
                     <svg className="w-10 h-10 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
                     </svg>
+                  )}
+                  {photoUploading && (
+                    <div className="absolute inset-0 bg-white/70 flex items-center justify-center">
+                      <svg className="animate-spin h-6 w-6 text-emerald-500" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                    </div>
                   )}
                 </div>
                 <input
@@ -779,8 +817,10 @@ export default function VetApplicationForm({
           <div>
             <MultiFileUpload
               label="1- بڕوانامە / Certificate"
-              value={formData.collegeCertificateBase64}
-              onChange={(files) => setFormData((prev) => ({ ...prev, collegeCertificateBase64: files }))}
+              value={docFiles.collegeCertificateBase64}
+              onChange={(files) => setDocFiles((prev) => ({ ...prev, collegeCertificateBase64: files }))}
+              sessionToken={sessionToken}
+              fieldName="collegeCertificateBase64"
               accept="image/*,.pdf"
               required
             />
@@ -790,8 +830,10 @@ export default function VetApplicationForm({
           <div>
             <MultiFileUpload
               label="2- کارتی نیشتیمانی / National ID Card"
-              value={formData.nationalIdCardBase64}
-              onChange={(files) => setFormData((prev) => ({ ...prev, nationalIdCardBase64: files }))}
+              value={docFiles.nationalIdCardBase64}
+              onChange={(files) => setDocFiles((prev) => ({ ...prev, nationalIdCardBase64: files }))}
+              sessionToken={sessionToken}
+              fieldName="nationalIdCardBase64"
               accept="image/*,.pdf"
               required
             />
@@ -801,21 +843,24 @@ export default function VetApplicationForm({
           <div>
             <MultiFileUpload
               label="3- کارتی زانیاری / Information Card"
-              value={formData.infoCardBase64}
-              onChange={(files) => setFormData((prev) => ({ ...prev, infoCardBase64: files }))}
+              value={docFiles.infoCardBase64}
+              onChange={(files) => setDocFiles((prev) => ({ ...prev, infoCardBase64: files }))}
+              sessionToken={sessionToken}
+              fieldName="infoCardBase64"
               accept="image/*,.pdf"
               required
             />
           </div>
 
-          {/* 4- Recommendation Letter */}
+          {/* 4- Recommendation Letter (optional) */}
           <div>
             <MultiFileUpload
-              label="4- پاڵێنامە / Recommendation Letter"
-              value={formData.recommendationLetterBase64}
-              onChange={(files) => setFormData((prev) => ({ ...prev, recommendationLetterBase64: files }))}
+              label="4- پاڵێنامە / Recommendation Letter (Optional / ئارەزوومەندانە)"
+              value={docFiles.recommendationLetterBase64}
+              onChange={(files) => setDocFiles((prev) => ({ ...prev, recommendationLetterBase64: files }))}
+              sessionToken={sessionToken}
+              fieldName="recommendationLetterBase64"
               accept="image/*,.pdf"
-              required
             />
           </div>
         </div>
@@ -928,6 +973,8 @@ export default function VetApplicationForm({
             setFormData((prev) => ({ ...prev, photoBase64: croppedBase64 }));
             setCropImageSrc(null);
             if (photoInputRef.current) photoInputRef.current.value = "";
+            // Upload cropped photo to temp storage
+            uploadPhotoToTemp(croppedBase64);
           }}
           onCancel={() => {
             setCropImageSrc(null);

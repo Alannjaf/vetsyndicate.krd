@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { vetApplications, cities, branchAssignments, vetMembers } from "@/lib/db/schema";
+import { vetApplications, cities, branchAssignments, vetMembers, tempUploads } from "@/lib/db/schema";
 import { auth } from "@/lib/auth/auth";
 import { eq, and, inArray } from "drizzle-orm";
 
@@ -95,36 +95,79 @@ export async function PUT(
 
     const body = await request.json();
 
+    // Resolve files from temp_uploads if session token is present
+    if (body.uploadSessionToken) {
+      const uploads = await db
+        .select()
+        .from(tempUploads)
+        .where(eq(tempUploads.sessionToken, body.uploadSessionToken));
+
+      // Group uploads by fieldName
+      const byField: Record<string, string[]> = {};
+      for (const upload of uploads) {
+        if (!byField[upload.fieldName]) byField[upload.fieldName] = [];
+        byField[upload.fieldName].push(upload.fileData);
+      }
+
+      // Resolve photo (single value) — only if new upload exists
+      if (byField.photoBase64?.length) {
+        body.photoBase64 = byField.photoBase64[0];
+      }
+
+      // Resolve document arrays — only override fields that have new uploads
+      const docFields = [
+        "collegeCertificateBase64",
+        "nationalIdCardBase64",
+        "infoCardBase64",
+        "recommendationLetterBase64",
+      ];
+      for (const field of docFields) {
+        if (byField[field]?.length) {
+          body[field] = JSON.stringify(byField[field]);
+        }
+      }
+    }
+
+    // For fields not uploaded via temp, keep existing DB values
+    const updateData: Record<string, unknown> = {
+      fullNameKu: body.fullNameKu,
+      fullNameEn: body.fullNameEn,
+      dateOfBirth: body.dateOfBirth,
+      placeOfBirth: body.placeOfBirth || null,
+      nationalIdNumber: body.nationalIdNumber,
+      nationalIdDate: body.nationalIdDate || null,
+      marriageStatus: body.marriageStatus,
+      numberOfChildren: body.numberOfChildren || 0,
+      bloodType: body.bloodType,
+      universityDegrees: body.universityDegrees || null,
+      scientificRank: body.scientificRank || null,
+      collegeCertificateBase64: body.collegeCertificateBase64 ?? existing.collegeCertificateBase64,
+      jobLocation: body.jobLocation,
+      yearOfEmployment: body.yearOfEmployment || null,
+      privateWorkDetails: body.privateWorkDetails || null,
+      currentLocation: body.currentLocation,
+      phoneNumber: body.phoneNumber,
+      emailAddress: body.emailAddress,
+      cityId: body.cityId,
+      nationalIdCardBase64: body.nationalIdCardBase64 ?? existing.nationalIdCardBase64,
+      infoCardBase64: body.infoCardBase64 ?? existing.infoCardBase64,
+      recommendationLetterBase64: body.recommendationLetterBase64 ?? existing.recommendationLetterBase64,
+      signatureBase64: body.signatureBase64 ?? existing.signatureBase64,
+      photoBase64: body.photoBase64 ?? existing.photoBase64,
+    };
+
     const [updated] = await db
       .update(vetApplications)
-      .set({
-        fullNameKu: body.fullNameKu,
-        fullNameEn: body.fullNameEn,
-        dateOfBirth: body.dateOfBirth,
-        placeOfBirth: body.placeOfBirth || null,
-        nationalIdNumber: body.nationalIdNumber,
-        nationalIdDate: body.nationalIdDate || null,
-        marriageStatus: body.marriageStatus,
-        numberOfChildren: body.numberOfChildren || 0,
-        bloodType: body.bloodType,
-        universityDegrees: body.universityDegrees || null,
-        scientificRank: body.scientificRank || null,
-        collegeCertificateBase64: body.collegeCertificateBase64,
-        jobLocation: body.jobLocation,
-        yearOfEmployment: body.yearOfEmployment || null,
-        privateWorkDetails: body.privateWorkDetails || null,
-        currentLocation: body.currentLocation,
-        phoneNumber: body.phoneNumber,
-        emailAddress: body.emailAddress,
-        cityId: body.cityId,
-        nationalIdCardBase64: body.nationalIdCardBase64,
-        infoCardBase64: body.infoCardBase64,
-        recommendationLetterBase64: body.recommendationLetterBase64,
-        signatureBase64: body.signatureBase64,
-        photoBase64: body.photoBase64,
-      })
+      .set(updateData)
       .where(eq(vetApplications.id, applicationId))
       .returning();
+
+    // Clean up temp uploads
+    if (body.uploadSessionToken) {
+      await db
+        .delete(tempUploads)
+        .where(eq(tempUploads.sessionToken, body.uploadSessionToken));
+    }
 
     return NextResponse.json(updated);
   } catch (error) {

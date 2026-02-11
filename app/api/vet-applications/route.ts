@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { vetApplications, cities, branchAssignments } from "@/lib/db/schema";
+import { vetApplications, cities, branchAssignments, tempUploads } from "@/lib/db/schema";
 import { auth } from "@/lib/auth/auth";
 import { eq, desc, inArray, and, count } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
@@ -98,7 +98,40 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    
+
+    // Resolve files from temp_uploads if session token is present
+    if (body.uploadSessionToken) {
+      const uploads = await db
+        .select()
+        .from(tempUploads)
+        .where(eq(tempUploads.sessionToken, body.uploadSessionToken));
+
+      // Group uploads by fieldName
+      const byField: Record<string, string[]> = {};
+      for (const upload of uploads) {
+        if (!byField[upload.fieldName]) byField[upload.fieldName] = [];
+        byField[upload.fieldName].push(upload.fileData);
+      }
+
+      // Resolve photo (single value)
+      if (byField.photoBase64?.length) {
+        body.photoBase64 = byField.photoBase64[0];
+      }
+
+      // Resolve document arrays as JSON-stringified arrays
+      const docFields = [
+        "collegeCertificateBase64",
+        "nationalIdCardBase64",
+        "infoCardBase64",
+        "recommendationLetterBase64",
+      ];
+      for (const field of docFields) {
+        if (byField[field]?.length) {
+          body[field] = JSON.stringify(byField[field]);
+        }
+      }
+    }
+
     // Check if this is an admin/branch submission
     const session = await auth();
     const isAdminSubmission = session && ["syndicate", "branch_head"].includes(session.user.role);
@@ -189,11 +222,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // All document fields are required (no conditions)
+    // Required document fields (recommendation letter is optional)
     const requiredDocArrayFields = [
       { field: "nationalIdCardBase64", label: "National ID Card" },
       { field: "infoCardBase64", label: "Information Card" },
-      { field: "recommendationLetterBase64", label: "Recommendation Letter" },
     ];
     for (const { field, label } of requiredDocArrayFields) {
       const val = body[field];
@@ -282,7 +314,7 @@ export async function POST(request: NextRequest) {
         cityId: body.cityId,
         nationalIdCardBase64: body.nationalIdCardBase64,
         infoCardBase64: body.infoCardBase64,
-        recommendationLetterBase64: body.recommendationLetterBase64,
+        recommendationLetterBase64: body.recommendationLetterBase64 || null,
         confirmationChecked: isAdminSubmission ? true : body.confirmationChecked,
         signatureBase64: body.signatureBase64 || "",
         photoBase64: body.photoBase64,
@@ -290,6 +322,13 @@ export async function POST(request: NextRequest) {
         submittedById,
       })
       .returning();
+
+    // Clean up temp uploads
+    if (body.uploadSessionToken) {
+      await db
+        .delete(tempUploads)
+        .where(eq(tempUploads.sessionToken, body.uploadSessionToken));
+    }
 
     // Send confirmation email (optional for admin submissions)
     const shouldSendEmail = isAdminSubmission ? body.sendEmail !== false : true;
