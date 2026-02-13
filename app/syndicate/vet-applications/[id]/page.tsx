@@ -71,7 +71,7 @@ export default function AdminApplicationReviewPage({
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
   const [titleEn, setTitleEn] = useState("Veterinarian");
-  const [titleKu, setTitleKu] = useState("پزیشکی ئاژەڵان");
+  const [titleKu, setTitleKu] = useState("پزیشکی ڤێتێرنەری");
   const [titleAr, setTitleAr] = useState("طبيب بيطري");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 

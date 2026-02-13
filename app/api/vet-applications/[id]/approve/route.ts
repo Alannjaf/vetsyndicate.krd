@@ -54,7 +54,7 @@ export async function POST(
     // Get optional title from request body
     const body = await request.json().catch(() => ({}));
     const titleEn = body.titleEn || "Veterinarian";
-    const titleKu = body.titleKu || "پزیشکی ئاژەڵان";
+    const titleKu = body.titleKu || "پزیشکی ڤێتێرنەری";
     const titleAr = body.titleAr || "طبيب بيطري";
 
     // Generate member ID (sequential: 00001, 00002, etc.)

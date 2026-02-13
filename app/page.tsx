@@ -141,13 +141,13 @@ export default async function Home() {
               Are You a Veterinarian?
             </h3>
             <p className="text-2xl font-semibold text-amber-600 mb-4" dir="rtl">
-              ئایا تۆ پزیشکی ئاژەڵانیت؟
+              ئایا تۆ پزیشکی ڤێتێرنەرییت؟
             </p>
             <p className="text-lg text-gray-600 mb-4 max-w-2xl mx-auto">
               Join the Veterinarians Syndicate in Kurdistan Region of Iraq. Apply online for membership and become part of a professional community advancing animal health and welfare.
             </p>
             <p className="text-lg text-gray-500 mb-8 max-w-2xl mx-auto" dir="rtl">
-              ئەندام بە لە سەندیکای پزیشکانی ئاژەڵانی هەرێمی کوردستانی عێراق. بە ئۆنلاین داواکاری ئەندامەتی بکە و ببە بەشێک لە کۆمەڵگەیەکی پیشەیی کە لە پێناو تەندروستی و خۆشگوزەرانی ئاژەڵاندا کار دەکات.
+              ئەندام بە لە سەندیکای پزیشکانی ڤێتێرنەری هەرێمی کوردستانی عێراق. بە ئۆنلاین داواکاری ئەندامەتی بکە و ببە بەشێک لە کۆمەڵگەیەکی پیشەیی کە لە پێناو تەندروستی و خۆشگوزەرانی ئاژەڵاندا کار دەکات.
             </p>
             <Link
               href="/apply"

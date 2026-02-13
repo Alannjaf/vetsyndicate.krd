@@ -102,7 +102,7 @@ export default function ApplyPage() {
             Veterinary Syndicate Membership Application
           </h1>
           <p className="text-gray-600">
-            داواکاری ئەندامەتی سەندیکای پزیشکانی ئاژەڵان
+            داواکاری ئەندامەتی سەندیکای پزیشکانی ڤێتێرنەری
           </p>
         </div>
 

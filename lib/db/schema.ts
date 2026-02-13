@@ -262,7 +262,7 @@ export const vetMembers = pgTable("vet_members", {
   fullNameKu: text("full_name_ku").notNull(),
   fullNameEn: text("full_name_en").notNull(),
   titleEn: text("title_en").notNull().default("Veterinarian"),
-  titleKu: text("title_ku").notNull().default("پزیشکی ئاژەڵان"),
+  titleKu: text("title_ku").notNull().default("پزیشکی ڤێتێرنەری"),
   titleAr: text("title_ar").default("طبيب بيطري"),
   dateOfBirth: text("date_of_birth").notNull(),
   photoBase64: text("photo_base64").notNull(),
