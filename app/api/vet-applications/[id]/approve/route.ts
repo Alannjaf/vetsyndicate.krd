@@ -57,19 +57,48 @@ export async function POST(
     const titleKu = body.titleKu || "پزیشکی ڤێتێرنەری";
     const titleAr = body.titleAr || "طبيب بيطري";
 
-    // Generate member ID (sequential: 00001, 00002, etc.)
-    const [memberCount] = await db
+    // Get city info to determine prefix
+    const [city] = await db
+      .select()
+      .from(cities)
+      .where(eq(cities.id, application.cityId));
+
+    if (!city) {
+      return NextResponse.json({ error: "City not found" }, { status: 404 });
+    }
+
+    // Map city codes to single-letter prefixes
+    const cityPrefixMap: Record<string, string> = {
+      "ERB": "H",  // Hewlêr (Erbil)
+      "DHK": "D",  // Duhok
+      "ZKH": "Z",  // Zakho
+    };
+
+    const prefix = cityPrefixMap[city.code];
+    if (!prefix) {
+      return NextResponse.json(
+        { error: `No member ID prefix configured for city code ${city.code}` },
+        { status: 400 }
+      );
+    }
+
+    // Generate member ID with city prefix (e.g., H001, D001, Z001)
+    const [cityMemberCount] = await db
       .select({ count: count() })
-      .from(vetMembers);
-    const nextNumber = (memberCount?.count || 0) + 1;
-    const memberId = nextNumber.toString().padStart(5, "0");
+      .from(vetMembers)
+      .where(eq(vetMembers.cityId, application.cityId));
+    const nextNumber = (cityMemberCount?.count || 0) + 1;
+    const memberId = `${prefix}${nextNumber.toString().padStart(3, "0")}`;
 
     // Generate QR code ID
     const qrCodeId = `VET-${uuidv4().substring(0, 8).toUpperCase()}`;
 
-    // Calculate expiry date (1 year from now)
-    const issueDate = new Date();
-    const expiryDate = new Date();
+    // Set issue date to January 1st of current year
+    const now = new Date();
+    const issueDate = new Date(now.getFullYear(), 0, 1); // January 1st
+
+    // Calculate expiry date (1 year from issue date)
+    const expiryDate = new Date(issueDate);
     expiryDate.setFullYear(expiryDate.getFullYear() + 1);
 
     // Create member record
