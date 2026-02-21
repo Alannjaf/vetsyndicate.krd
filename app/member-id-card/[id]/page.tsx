@@ -199,9 +199,9 @@ export default function MemberIdCardPage() {
               position: "relative",
             }}
           >
-            {/* PNG Background */}
+            {/* Background */}
             <img
-              src="/id-card-back.png"
+              src="/id-card-front.jpg"
               alt="ID Card Front"
               style={{
                 width: "100%",
@@ -377,9 +377,9 @@ export default function MemberIdCardPage() {
               position: "relative",
             }}
           >
-            {/* PNG Background */}
+            {/* Background */}
             <img
-              src="/id-card-front.png"
+              src="/id-card-back.jpg"
               alt="ID Card Back"
               style={{
                 width: "100%",
