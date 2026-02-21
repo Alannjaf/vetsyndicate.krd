@@ -142,7 +142,6 @@ export default function MemberIdCardPage() {
 
   return (
     <div className="min-h-screen bg-gray-100 py-8 px-4">
-
       <div className="max-w-lg mx-auto">
         {/* Header */}
         <div className="text-center mb-6">
@@ -193,7 +192,8 @@ export default function MemberIdCardPage() {
             id="front-card"
             className="rounded-xl shadow-2xl overflow-hidden"
             style={{
-              fontFamily: "var(--font-rabar), var(--font-noto-naskh), Arial, sans-serif",
+              fontFamily:
+                "var(--font-rabar), var(--font-noto-naskh), Arial, sans-serif",
               width: `${CARD_WIDTH}px`,
               height: `${CARD_HEIGHT}px`,
               position: "relative",
@@ -216,7 +216,7 @@ export default function MemberIdCardPage() {
                 style={{
                   position: "absolute",
                   top: "115px", // ← PHOTO vertical position
-                  left: "15px", // ← PHOTO horizontal position
+                  left: "25px", // ← PHOTO horizontal position
                   width: "95px", // ← PHOTO width
                   height: "115px", // ← PHOTO height
                   overflow: "hidden",
@@ -319,18 +319,50 @@ export default function MemberIdCardPage() {
               }}
             >
               <span
-                style={{ direction: "rtl", fontSize: "12px", fontWeight: "normal", color: "#1a1a1a" }}
+                style={{
+                  direction: "rtl",
+                  fontSize: "12px",
+                  fontWeight: "normal",
+                  color: "#1a1a1a",
+                }}
               >
                 {member.titleKu}
               </span>
-              <span style={{ fontSize: "12px", fontWeight: "normal", color: "#1a1a1a" }}>/</span>
               <span
-                style={{ direction: "rtl", fontSize: "12px", fontWeight: "normal", color: "#1a1a1a" }}
+                style={{
+                  fontSize: "12px",
+                  fontWeight: "normal",
+                  color: "#1a1a1a",
+                }}
+              >
+                /
+              </span>
+              <span
+                style={{
+                  direction: "rtl",
+                  fontSize: "12px",
+                  fontWeight: "normal",
+                  color: "#1a1a1a",
+                }}
               >
                 {member.titleAr || "طبيب بيطري"}
               </span>
-              <span style={{ fontSize: "12px", fontWeight: "normal", color: "#1a1a1a" }}>/</span>
-              <span style={{ fontSize: "12px", fontWeight: "normal", color: "#1a1a1a" }}>
+              <span
+                style={{
+                  fontSize: "12px",
+                  fontWeight: "normal",
+                  color: "#1a1a1a",
+                }}
+              >
+                /
+              </span>
+              <span
+                style={{
+                  fontSize: "12px",
+                  fontWeight: "normal",
+                  color: "#1a1a1a",
+                }}
+              >
                 {member.titleEn}
               </span>
             </div>
@@ -371,7 +403,8 @@ export default function MemberIdCardPage() {
             id="back-card"
             className="rounded-xl shadow-2xl overflow-hidden"
             style={{
-              fontFamily: "var(--font-rabar), var(--font-noto-naskh), Arial, sans-serif",
+              fontFamily:
+                "var(--font-rabar), var(--font-noto-naskh), Arial, sans-serif",
               width: `${CARD_WIDTH}px`,
               height: `${CARD_HEIGHT}px`,
               position: "relative",
@@ -392,8 +425,8 @@ export default function MemberIdCardPage() {
             <div
               style={{
                 position: "absolute",
-                top: "140px",
-                left: "30px",
+                top: "137px",
+                left: "27px",
                 width: "90px",
                 height: "90px",
                 backgroundColor: "white",

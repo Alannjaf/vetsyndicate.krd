@@ -30,7 +30,9 @@
       "Bash(winget install:*)",
       "Bash(choco install:*)",
       "Bash(jq:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(git -C /c/Users/alan0/Desktop/Projects/pet-passport-system remote -v)",
+      "Bash(gh auth status:*)"
     ]
   }
 }
