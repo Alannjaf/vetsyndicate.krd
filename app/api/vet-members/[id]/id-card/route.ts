@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth/auth";
 import { db } from "@/lib/db";
-import { vetMembers, cities } from "@/lib/db/schema";
+import { vetMembers, vetApplications, cities } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import QRCode from "qrcode";
 
@@ -43,6 +43,12 @@ export async function GET(
       .from(cities)
       .where(eq(cities.id, member.cityId));
 
+    // Get blood type from linked application
+    const [application] = await db
+      .select({ bloodType: vetApplications.bloodType })
+      .from(vetApplications)
+      .where(eq(vetApplications.id, member.applicationId));
+
     // Generate QR code as data URL (with caching)
     const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
     const verifyUrl = `${baseUrl}/verify/${member.qrCodeId}`;
@@ -78,6 +84,7 @@ export async function GET(
         qrCodeId: member.qrCodeId,
         issueDate: member.issueDate,
         expiryDate: member.expiryDate,
+        bloodGroup: application?.bloodType || null,
         cityCode: city?.code || null,
         qrDataUrl: qrDataUrl,
       },

@@ -16,6 +16,7 @@ interface MemberData {
   qrCodeId: string;
   issueDate: string;
   expiryDate: string;
+  bloodGroup: string | null;
   cityCode: string | null;
   qrDataUrl: string;
 }
@@ -227,20 +228,6 @@ export default function MemberIdCardPage() {
                 }}
               />
             )}
-
-            {/* Stamp — in front of photo */}
-            <img
-              src="/stamp.png"
-              alt="Stamp"
-              style={{
-                position: "absolute",
-                top: "100px", // ← STAMP vertical position
-                left: "85px", // ← STAMP horizontal position
-                width: "55px", // ← STAMP size
-                height: "55px",
-                opacity: 0.85,
-              }}
-            />
 
             {/* Signature — in front of photo */}
             <img
@@ -457,7 +444,7 @@ export default function MemberIdCardPage() {
             <div
               style={{
                 position: "absolute",
-                top: "160px",
+                top: "155px",
                 left: "140px",
                 right: "15px",
                 textAlign: "right",
@@ -470,12 +457,41 @@ export default function MemberIdCardPage() {
               {member.memberId}
             </div>
 
+            {/* Label: Blood Group */}
+            <div
+              style={{
+                ...labelStyle,
+                position: "absolute",
+                top: "175px",
+                left: "140px",
+              }}
+            >
+              B.G./گروپی خوێن/فصيلة الدم
+            </div>
+
+            {/* Blood Group Value */}
+            <div
+              style={{
+                position: "absolute",
+                top: "190px",
+                left: "140px",
+                right: "15px",
+                textAlign: "right",
+                fontSize: "13px",
+                fontWeight: "normal",
+                color: "#1a1a1a",
+                lineHeight: "1.2",
+              }}
+            >
+              {member.bloodGroup || "—"}
+            </div>
+
             {/* Label: بەرواری بەسەرچوون (Expiry Date) */}
             <div
               style={{
                 ...labelStyle,
                 position: "absolute",
-                top: "200px",
+                top: "210px",
                 left: "140px",
               }}
             >
@@ -486,7 +502,7 @@ export default function MemberIdCardPage() {
             <div
               style={{
                 position: "absolute",
-                top: "215px",
+                top: "225px",
                 left: "140px",
                 right: "15px",
                 textAlign: "right",

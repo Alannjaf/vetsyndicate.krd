@@ -273,7 +273,7 @@ export const vetMembers = pgTable("vet_members", {
   emailAddress: text("email_address"),
   jobLocation: text("job_location"),
   scientificRank: text("scientific_rank"),  // NEW: Academic/scientific rank
-  
+
   // ID details
   qrCodeId: text("qr_code_id").notNull().unique(),
   issueDate: timestamp("issue_date").defaultNow().notNull(),

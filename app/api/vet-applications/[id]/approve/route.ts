@@ -67,11 +67,11 @@ export async function POST(
       return NextResponse.json({ error: "City not found" }, { status: 404 });
     }
 
-    // Map city codes to single-letter prefixes
+    // Map city codes to member ID prefixes
     const cityPrefixMap: Record<string, string> = {
-      "ERB": "H",  // Hewlêr (Erbil)
-      "DHK": "D",  // Duhok
-      "ZKH": "Z",  // Zakho
+      "ERB": "ERB",  // Erbil
+      "DHK": "DUH",  // Duhok
+      "ZKH": "ZKO",  // Zakho
     };
 
     const prefix = cityPrefixMap[city.code];
@@ -82,7 +82,7 @@ export async function POST(
       );
     }
 
-    // Generate member ID with city prefix (e.g., H001, D001, Z001)
+    // Generate member ID with city prefix (e.g., ERB001, DUH001, ZKO001)
     const [cityMemberCount] = await db
       .select({ count: count() })
       .from(vetMembers)
