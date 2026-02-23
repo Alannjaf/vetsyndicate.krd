@@ -466,7 +466,7 @@ export default function MemberIdCardPage() {
                 left: "140px",
               }}
             >
-              B.G./گروپی خوێن/فصيلة الدم
+              گروپی خوێن/فصيلة الدم/B.G.
             </div>
 
             {/* Blood Group Value */}
