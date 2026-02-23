@@ -202,7 +202,7 @@ export default function MemberIdCardPage() {
           >
             {/* Background */}
             <img
-              src="/id-card-front.jpg"
+              src="/id-card-front.jpg?v=2"
               alt="ID Card Front"
               style={{
                 width: "100%",
@@ -399,7 +399,7 @@ export default function MemberIdCardPage() {
           >
             {/* Background */}
             <img
-              src="/id-card-back.jpg"
+              src="/id-card-back.jpg?v=2"
               alt="ID Card Back"
               style={{
                 width: "100%",
