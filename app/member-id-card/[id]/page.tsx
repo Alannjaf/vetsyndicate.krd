@@ -216,7 +216,7 @@ export default function MemberIdCardPage() {
               <div
                 style={{
                   position: "absolute",
-                  top: "115px", // ← PHOTO vertical position
+                  top: "110px", // ← PHOTO vertical position
                   left: "25px", // ← PHOTO horizontal position
                   width: "95px", // ← PHOTO width
                   height: "115px", // ← PHOTO height
@@ -413,7 +413,7 @@ export default function MemberIdCardPage() {
               style={{
                 position: "absolute",
                 top: "137px",
-                left: "27px",
+                left: "30px",
                 width: "90px",
                 height: "90px",
                 backgroundColor: "white",
