@@ -444,7 +444,7 @@ export default function MemberIdCardPage() {
             <div
               style={{
                 position: "absolute",
-                top: "137px",
+                top: "115px",
                 left: "140px",
                 right: "15px",
                 textAlign: "right",
@@ -495,7 +495,7 @@ export default function MemberIdCardPage() {
                 left: "140px",
               }}
             >
-              رێکەوتی بەسەرچوون/تاريخ النفاذ/Date of Expiry
+              رێکەوتی بەسەرچوون/تاريخ النفاذ/Exp. Date
             </div>
 
             {/* Expiry Date */}
@@ -506,7 +506,7 @@ export default function MemberIdCardPage() {
                 left: "140px",
                 right: "15px",
                 textAlign: "right",
-                fontSize: "15px",
+                fontSize: "13px",
                 fontWeight: "normal",
                 color: "#1a1a1a",
                 lineHeight: "1.3",
