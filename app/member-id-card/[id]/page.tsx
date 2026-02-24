@@ -247,7 +247,7 @@ export default function MemberIdCardPage() {
             <div
               style={{
                 position: "absolute",
-                top: "113px",
+                top: "105px",
                 left: "130px",
                 right: "15px",
                 textAlign: "right",
@@ -265,7 +265,7 @@ export default function MemberIdCardPage() {
             <div
               style={{
                 position: "absolute",
-                top: "135px",
+                top: "125px",
                 left: "130px",
                 right: "15px",
                 textAlign: "right",
@@ -283,7 +283,7 @@ export default function MemberIdCardPage() {
               style={{
                 ...labelStyle,
                 position: "absolute",
-                top: "160px",
+                top: "150px",
                 left: "130px",
               }}
             >
@@ -294,7 +294,7 @@ export default function MemberIdCardPage() {
             <div
               style={{
                 position: "absolute",
-                top: "180px",
+                top: "165px",
                 left: "130px",
                 right: "15px",
                 display: "flex",
@@ -433,7 +433,7 @@ export default function MemberIdCardPage() {
               style={{
                 ...labelStyle,
                 position: "absolute",
-                top: "137px",
+                top: "105px",
                 left: "140px",
               }}
             >
@@ -444,7 +444,7 @@ export default function MemberIdCardPage() {
             <div
               style={{
                 position: "absolute",
-                top: "157px",
+                top: "137px",
                 left: "140px",
                 right: "15px",
                 textAlign: "right",
@@ -462,7 +462,7 @@ export default function MemberIdCardPage() {
               style={{
                 ...labelStyle,
                 position: "absolute",
-                top: "181px",
+                top: "151px",
                 left: "140px",
               }}
             >
@@ -473,7 +473,7 @@ export default function MemberIdCardPage() {
             <div
               style={{
                 position: "absolute",
-                top: "201px",
+                top: "171px",
                 left: "140px",
                 right: "15px",
                 textAlign: "right",
@@ -491,7 +491,7 @@ export default function MemberIdCardPage() {
               style={{
                 ...labelStyle,
                 position: "absolute",
-                top: "225px",
+                top: "200px",
                 left: "140px",
               }}
             >
@@ -502,7 +502,7 @@ export default function MemberIdCardPage() {
             <div
               style={{
                 position: "absolute",
-                top: "245px",
+                top: "220px",
                 left: "140px",
                 right: "15px",
                 textAlign: "right",
