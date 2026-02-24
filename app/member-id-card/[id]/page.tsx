@@ -132,7 +132,7 @@ export default function MemberIdCardPage() {
   }
 
   const labelStyle: React.CSSProperties = {
-    fontSize: "13px",
+    fontSize: "15px",
     color: "#1a1a1a",
     fontWeight: "normal",
     direction: "rtl",
@@ -247,18 +247,18 @@ export default function MemberIdCardPage() {
             <div
               style={{
                 position: "absolute",
-                top: "115px",
+                top: "113px",
                 left: "130px",
                 right: "15px",
                 textAlign: "right",
                 direction: "rtl",
-                fontSize: "13px",
-                fontWeight: "normal",
+                fontSize: "15px",
+                fontWeight: "bold",
                 color: "#1a1a1a",
                 lineHeight: "1.3",
               }}
             >
-              {member.fullNameKu}
+              دکتۆر {member.fullNameKu}
             </div>
 
             {/* English name */}
@@ -269,13 +269,13 @@ export default function MemberIdCardPage() {
                 left: "130px",
                 right: "15px",
                 textAlign: "right",
-                fontSize: "13px",
-                fontWeight: "normal",
+                fontSize: "15px",
+                fontWeight: "bold",
                 color: "#1a1a1a",
                 lineHeight: "1.3",
               }}
             >
-              {member.fullNameEn}
+              Dr. {member.fullNameEn}
             </div>
 
             {/* Label: پیشە (Profession) */}
@@ -294,7 +294,7 @@ export default function MemberIdCardPage() {
             <div
               style={{
                 position: "absolute",
-                top: "175px",
+                top: "180px",
                 left: "130px",
                 right: "15px",
                 display: "flex",
@@ -308,7 +308,7 @@ export default function MemberIdCardPage() {
               <span
                 style={{
                   direction: "rtl",
-                  fontSize: "12px",
+                  fontSize: "15px",
                   fontWeight: "normal",
                   color: "#1a1a1a",
                 }}
@@ -317,7 +317,7 @@ export default function MemberIdCardPage() {
               </span>
               <span
                 style={{
-                  fontSize: "12px",
+                  fontSize: "15px",
                   fontWeight: "normal",
                   color: "#1a1a1a",
                 }}
@@ -327,7 +327,7 @@ export default function MemberIdCardPage() {
               <span
                 style={{
                   direction: "rtl",
-                  fontSize: "12px",
+                  fontSize: "15px",
                   fontWeight: "normal",
                   color: "#1a1a1a",
                 }}
@@ -336,7 +336,7 @@ export default function MemberIdCardPage() {
               </span>
               <span
                 style={{
-                  fontSize: "12px",
+                  fontSize: "15px",
                   fontWeight: "normal",
                   color: "#1a1a1a",
                 }}
@@ -345,7 +345,7 @@ export default function MemberIdCardPage() {
               </span>
               <span
                 style={{
-                  fontSize: "12px",
+                  fontSize: "15px",
                   fontWeight: "normal",
                   color: "#1a1a1a",
                 }}
@@ -359,7 +359,7 @@ export default function MemberIdCardPage() {
               style={{
                 ...labelStyle,
                 position: "absolute",
-                top: "217px",
+                top: "205px",
                 left: "130px",
               }}
             >
@@ -370,11 +370,11 @@ export default function MemberIdCardPage() {
             <div
               style={{
                 position: "absolute",
-                top: "230px",
+                top: "225px",
                 left: "130px",
                 right: "15px",
                 textAlign: "right",
-                fontSize: "13px",
+                fontSize: "15px",
                 fontWeight: "normal",
                 color: "#1a1a1a",
                 lineHeight: "1.3",
@@ -433,7 +433,7 @@ export default function MemberIdCardPage() {
               style={{
                 ...labelStyle,
                 position: "absolute",
-                top: "140px",
+                top: "137px",
                 left: "140px",
               }}
             >
@@ -444,11 +444,11 @@ export default function MemberIdCardPage() {
             <div
               style={{
                 position: "absolute",
-                top: "155px",
+                top: "157px",
                 left: "140px",
                 right: "15px",
                 textAlign: "right",
-                fontSize: "13px",
+                fontSize: "15px",
                 fontWeight: "normal",
                 color: "#1a1a1a",
                 lineHeight: "1.2",
@@ -462,22 +462,22 @@ export default function MemberIdCardPage() {
               style={{
                 ...labelStyle,
                 position: "absolute",
-                top: "175px",
+                top: "181px",
                 left: "140px",
               }}
             >
-              گروپی خوێن/فصيلة الدم/B.G.
+              گروپی خوێن/فصيلة الدم/.B.G
             </div>
 
             {/* Blood Group Value */}
             <div
               style={{
                 position: "absolute",
-                top: "190px",
+                top: "201px",
                 left: "140px",
                 right: "15px",
                 textAlign: "right",
-                fontSize: "13px",
+                fontSize: "15px",
                 fontWeight: "normal",
                 color: "#1a1a1a",
                 lineHeight: "1.2",
@@ -491,7 +491,7 @@ export default function MemberIdCardPage() {
               style={{
                 ...labelStyle,
                 position: "absolute",
-                top: "210px",
+                top: "225px",
                 left: "140px",
               }}
             >
@@ -502,11 +502,11 @@ export default function MemberIdCardPage() {
             <div
               style={{
                 position: "absolute",
-                top: "225px",
+                top: "245px",
                 left: "140px",
                 right: "15px",
                 textAlign: "right",
-                fontSize: "13px",
+                fontSize: "15px",
                 fontWeight: "normal",
                 color: "#1a1a1a",
                 lineHeight: "1.3",
