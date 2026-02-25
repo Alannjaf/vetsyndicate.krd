@@ -290,7 +290,7 @@ export default function MemberIdCardPage() {
               نازناوی پیشە/العنوان الوظيفي/ Job Title
             </div>
 
-            {/* Title (Kurdish / Arabic / English, right-aligned) */}
+            {/* Title (Kurdish on first line, Arabic + English on second line) */}
             <div
               style={{
                 position: "absolute",
@@ -298,60 +298,36 @@ export default function MemberIdCardPage() {
                 left: "130px",
                 right: "15px",
                 display: "flex",
-                flexDirection: "row-reverse",
-                alignItems: "baseline",
-                justifyContent: "flex-start",
-                gap: "4px",
-                whiteSpace: "nowrap",
+                flexDirection: "column",
+                alignItems: "flex-end",
+                gap: "1px",
               }}
             >
-              <span
+              <div
                 style={{
                   direction: "rtl",
-                  fontSize: "15px",
+                  fontSize: "13px",
                   fontWeight: "normal",
                   color: "#1a1a1a",
+                  textAlign: "right",
+                  lineHeight: "1.3",
                 }}
               >
                 {member.titleKu}
-              </span>
-              <span
+              </div>
+              <div
                 style={{
-                  fontSize: "15px",
+                  fontSize: "13px",
                   fontWeight: "normal",
                   color: "#1a1a1a",
-                }}
-              >
-                /
-              </span>
-              <span
-                style={{
+                  textAlign: "right",
                   direction: "rtl",
-                  fontSize: "15px",
-                  fontWeight: "normal",
-                  color: "#1a1a1a",
+                  lineHeight: "1.3",
+                  whiteSpace: "nowrap",
                 }}
               >
-                {member.titleAr || "طبيب بيطري"}
-              </span>
-              <span
-                style={{
-                  fontSize: "15px",
-                  fontWeight: "normal",
-                  color: "#1a1a1a",
-                }}
-              >
-                /
-              </span>
-              <span
-                style={{
-                  fontSize: "15px",
-                  fontWeight: "normal",
-                  color: "#1a1a1a",
-                }}
-              >
-                {member.titleEn}
-              </span>
+                {member.titleAr || "طبيب بيطري"} / {member.titleEn}
+              </div>
             </div>
 
             {/* Label: بەرواری لەدایکبوون (Date of Birth) */}
