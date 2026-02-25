@@ -444,7 +444,7 @@ export default function MemberIdCardPage() {
             <div
               style={{
                 position: "absolute",
-                top: "115px",
+                top: "122px",
                 left: "140px",
                 right: "15px",
                 textAlign: "right",
@@ -502,11 +502,11 @@ export default function MemberIdCardPage() {
             <div
               style={{
                 position: "absolute",
-                top: "220px",
+                top: "223px",
                 left: "140px",
                 right: "15px",
                 textAlign: "right",
-                fontSize: "13px",
+                fontSize: "15px",
                 fontWeight: "normal",
                 color: "#1a1a1a",
                 lineHeight: "1.3",
