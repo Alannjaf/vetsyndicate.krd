@@ -41,17 +41,9 @@ export async function POST(
       }
     }
 
-    // Calculate new expiry date (1 year from now or from current expiry if not yet expired)
-    const currentExpiry = new Date(existingMember.expiryDate);
     const now = new Date();
     const newIssueDate = now;
-    const newExpiryDate = new Date();
-    
-    // If current expiry is in the future, extend from there; otherwise from today
-    if (currentExpiry > now) {
-      newExpiryDate.setTime(currentExpiry.getTime());
-    }
-    newExpiryDate.setFullYear(newExpiryDate.getFullYear() + 1);
+    const newExpiryDate = new Date(now.getFullYear(), 11, 31); // December 31st
 
     // Update member
     await db

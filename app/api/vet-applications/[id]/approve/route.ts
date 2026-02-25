@@ -97,9 +97,7 @@ export async function POST(
     const now = new Date();
     const issueDate = new Date(now.getFullYear(), 0, 1); // January 1st
 
-    // Calculate expiry date (1 year from issue date)
-    const expiryDate = new Date(issueDate);
-    expiryDate.setFullYear(expiryDate.getFullYear() + 1);
+    const expiryDate = new Date(now.getFullYear(), 11, 31); // December 31st
 
     // Create member record
     const [newMember] = await db
