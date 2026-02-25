@@ -21,6 +21,7 @@ interface Member {
   fullNameEn: string;
   titleEn: string;
   titleKu: string;
+  titleAr: string | null;
   dateOfBirth: string;
   photoBase64: string;
   nationalIdNumber: string | null;
@@ -59,6 +60,7 @@ export default function AdminMemberDetailPage({
     fullNameEn: "",
     titleEn: "",
     titleKu: "",
+    titleAr: "",
     dateOfBirth: "",
     phoneNumber: "",
     emailAddress: "",
@@ -84,6 +86,7 @@ export default function AdminMemberDetailPage({
         fullNameEn: data.fullNameEn || "",
         titleEn: data.titleEn || "",
         titleKu: data.titleKu || "",
+        titleAr: data.titleAr || "",
         dateOfBirth: data.dateOfBirth || "",
         phoneNumber: data.phoneNumber || "",
         emailAddress: data.emailAddress || "",
@@ -358,6 +361,18 @@ export default function AdminMemberDetailPage({
                     type="text"
                     value={editData.titleKu}
                     onChange={(e) => setEditData({ ...editData, titleKu: e.target.value })}
+                    dir="rtl"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Title (Arabic)
+                  </label>
+                  <input
+                    type="text"
+                    value={editData.titleAr}
+                    onChange={(e) => setEditData({ ...editData, titleAr: e.target.value })}
                     dir="rtl"
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                   />

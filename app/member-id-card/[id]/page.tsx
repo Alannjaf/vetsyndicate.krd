@@ -339,7 +339,7 @@ export default function MemberIdCardPage() {
                 left: "130px",
               }}
             >
-              بەرواری لەدایکبوون
+              لەدایک بوون/تاریخ المیلاد/Date of Birth
             </div>
 
             {/* Date of Birth */}
