@@ -294,35 +294,35 @@ export default function MemberIdCardPage() {
             <div
               style={{
                 position: "absolute",
-                top: "165px",
+                top: "171px",
                 left: "130px",
                 right: "15px",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "flex-end",
-                gap: "1px",
+                gap: "0px",
               }}
             >
               <div
                 style={{
                   direction: "rtl",
-                  fontSize: "13px",
+                  fontSize: "14px",
                   fontWeight: "normal",
                   color: "#1a1a1a",
                   textAlign: "right",
-                  lineHeight: "1.3",
+                  lineHeight: "1.15",
                 }}
               >
                 {member.titleKu}
               </div>
               <div
                 style={{
-                  fontSize: "13px",
+                  fontSize: "14px",
                   fontWeight: "normal",
                   color: "#1a1a1a",
                   textAlign: "right",
                   direction: "rtl",
-                  lineHeight: "1.3",
+                  lineHeight: "1.15",
                   whiteSpace: "nowrap",
                 }}
               >
