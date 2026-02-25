@@ -294,7 +294,7 @@ export default function MemberIdCardPage() {
             <div
               style={{
                 position: "absolute",
-                top: "171px",
+                top: "168px",
                 left: "130px",
                 right: "15px",
                 display: "flex",
