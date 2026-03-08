@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { vetApplications, vetMembers, cities } from "@/lib/db/schema";
+import { vetApplications, vetMembers } from "@/lib/db/schema";
 import { auth } from "@/lib/auth/auth";
-import { eq, count } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
 import { sendEmail, applicationApprovedEmail } from "@/lib/email/send";
 import { auditLog } from '@/lib/utils/audit';
@@ -51,44 +51,33 @@ export async function POST(
       );
     }
 
-    // Get optional title from request body
+    // Get fields from request body
     const body = await request.json().catch(() => ({}));
     const titleEn = body.titleEn || "Veterinarian";
     const titleKu = body.titleKu || "پزیشکی ڤێتێرنەری";
     const titleAr = body.titleAr || "طبيب بيطري";
+    const memberId = body.memberId?.trim();
 
-    // Get city info to determine prefix
-    const [city] = await db
-      .select()
-      .from(cities)
-      .where(eq(cities.id, application.cityId));
-
-    if (!city) {
-      return NextResponse.json({ error: "City not found" }, { status: 404 });
-    }
-
-    // Map city codes to member ID prefixes
-    const cityPrefixMap: Record<string, string> = {
-      "ERB": "ERB",  // Erbil
-      "DHK": "DUH",  // Duhok
-      "ZKH": "ZKO",  // Zakho
-    };
-
-    const prefix = cityPrefixMap[city.code];
-    if (!prefix) {
+    // Member ID is required (manually assigned)
+    if (!memberId) {
       return NextResponse.json(
-        { error: `No member ID prefix configured for city code ${city.code}` },
+        { error: "Member ID is required. Please enter a Member ID number." },
         { status: 400 }
       );
     }
 
-    // Generate member ID with city prefix (e.g., ERB001, DUH001, ZKO001)
-    const [cityMemberCount] = await db
-      .select({ count: count() })
+    // Check for duplicate member ID
+    const [existingMember] = await db
+      .select({ id: vetMembers.id })
       .from(vetMembers)
-      .where(eq(vetMembers.cityId, application.cityId));
-    const nextNumber = (cityMemberCount?.count || 0) + 1;
-    const memberId = `${prefix}${nextNumber.toString().padStart(3, "0")}`;
+      .where(eq(vetMembers.memberId, memberId));
+
+    if (existingMember) {
+      return NextResponse.json(
+        { error: `Member ID "${memberId}" is already in use. Please choose a different ID number.` },
+        { status: 409 }
+      );
+    }
 
     // Generate QR code ID
     const qrCodeId = `VET-${uuidv4().substring(0, 8).toUpperCase()}`;

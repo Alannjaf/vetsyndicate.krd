@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import React, { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -73,6 +73,9 @@ export default function AdminApplicationReviewPage({
   const [titleEn, setTitleEn] = useState("Veterinarian");
   const [titleKu, setTitleKu] = useState("پزیشکی ڤێتێرنەری");
   const [titleAr, setTitleAr] = useState("طبيب بيطري");
+  const [memberId, setMemberId] = useState("");
+  const [memberIdError, setMemberIdError] = useState("");
+  const [checkingMemberId, setCheckingMemberId] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
@@ -94,8 +97,39 @@ export default function AdminApplicationReviewPage({
     }
   };
 
+  // Check member ID for duplicates with debounce
+  const checkMemberIdDebounceRef = React.useRef<NodeJS.Timeout | null>(null);
+  const handleMemberIdChange = (value: string) => {
+    setMemberId(value);
+    setMemberIdError("");
+    if (checkMemberIdDebounceRef.current) {
+      clearTimeout(checkMemberIdDebounceRef.current);
+    }
+    if (!value.trim()) return;
+    setCheckingMemberId(true);
+    checkMemberIdDebounceRef.current = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/vet-members/check-id?memberId=${encodeURIComponent(value.trim())}`);
+        const data = await res.json();
+        if (data.exists) {
+          setMemberIdError(`Member ID "${value.trim()}" is already in use`);
+        }
+      } catch {} finally {
+        setCheckingMemberId(false);
+      }
+    }, 500);
+  };
+
   const handleApprove = async () => {
     if (!application) return;
+    if (!memberId.trim()) {
+      setError("Please enter a Member ID number before approving.");
+      return;
+    }
+    if (memberIdError) {
+      setError("Please fix the Member ID error before approving.");
+      return;
+    }
     setProcessing(true);
     setError("");
 
@@ -103,7 +137,7 @@ export default function AdminApplicationReviewPage({
       const response = await fetch(`/api/vet-applications/${id}/approve`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ titleEn, titleKu, titleAr }),
+        body: JSON.stringify({ titleEn, titleKu, titleAr, memberId: memberId.trim() }),
       });
 
       if (!response.ok) {
@@ -588,6 +622,35 @@ export default function AdminApplicationReviewPage({
               <h2 className="text-lg font-semibold text-gray-900 mb-4">
                 Review Actions
               </h2>
+
+              {/* Member ID field */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Member ID Number / ژمارەی ئەندامێتی <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={memberId}
+                  onChange={(e) => handleMemberIdChange(e.target.value)}
+                  placeholder="e.g. ERB001"
+                  className={`w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:border-transparent ${
+                    memberIdError
+                      ? "border-red-400 focus:ring-red-500"
+                      : memberId.trim() && !checkingMemberId
+                      ? "border-green-400 focus:ring-green-500"
+                      : "border-gray-300 focus:ring-emerald-500"
+                  }`}
+                />
+                {checkingMemberId && (
+                  <p className="text-xs text-gray-400 mt-1">Checking availability...</p>
+                )}
+                {memberIdError && (
+                  <p className="text-xs text-red-600 mt-1">{memberIdError}</p>
+                )}
+                {memberId.trim() && !memberIdError && !checkingMemberId && (
+                  <p className="text-xs text-green-600 mt-1">Member ID is available</p>
+                )}
+              </div>
 
               {/* Title fields for approval */}
               <div className="space-y-3 mb-4">
