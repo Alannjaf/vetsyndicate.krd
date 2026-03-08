@@ -109,16 +109,33 @@ export async function PUT(
       jobLocation,
       scientificRank,
     } = body;
+    const newMemberId = body.memberId?.trim();
 
     const base64Error = validateBase64Fields(body, ['photoBase64'])
     if (base64Error) {
       return NextResponse.json({ error: base64Error }, { status: 400 })
     }
 
+    // If memberId is being changed, check for duplicates
+    if (newMemberId && newMemberId !== existingMember.memberId) {
+      const [duplicate] = await db
+        .select({ id: vetMembers.id })
+        .from(vetMembers)
+        .where(eq(vetMembers.memberId, newMemberId));
+
+      if (duplicate) {
+        return NextResponse.json(
+          { error: `Member ID "${newMemberId}" is already in use. Please choose a different ID number.` },
+          { status: 409 }
+        );
+      }
+    }
+
     // Update member
     const [updatedMember] = await db
       .update(vetMembers)
       .set({
+        memberId: newMemberId || existingMember.memberId,
         fullNameKu: fullNameKu || existingMember.fullNameKu,
         fullNameEn: fullNameEn || existingMember.fullNameEn,
         titleEn: titleEn || existingMember.titleEn,

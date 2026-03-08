@@ -56,6 +56,7 @@ export default function MemberDetailPage({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [editData, setEditData] = useState({
+    memberId: "",
     fullNameKu: "",
     fullNameEn: "",
     titleEn: "",
@@ -68,6 +69,9 @@ export default function MemberDetailPage({
     educationLevel: "",
     photoBase64: "",
   });
+  const [memberIdError, setMemberIdError] = useState("");
+  const [checkingMemberId, setCheckingMemberId] = useState(false);
+  const checkMemberIdDebounceRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     fetchMember();
@@ -82,6 +86,7 @@ export default function MemberDetailPage({
       const data = await response.json();
       setMember(data);
       setEditData({
+        memberId: data.memberId || "",
         fullNameKu: data.fullNameKu || "",
         fullNameEn: data.fullNameEn || "",
         titleEn: data.titleEn || "",
@@ -94,6 +99,7 @@ export default function MemberDetailPage({
         educationLevel: data.educationLevel || "",
         photoBase64: data.photoBase64 || "",
       });
+      setMemberIdError("");
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
@@ -125,7 +131,36 @@ export default function MemberDetailPage({
     reader.readAsDataURL(file);
   };
 
+  const handleMemberIdChange = (value: string) => {
+    setEditData({ ...editData, memberId: value });
+    setMemberIdError("");
+    if (checkMemberIdDebounceRef.current) {
+      clearTimeout(checkMemberIdDebounceRef.current);
+    }
+    if (!value.trim() || value.trim() === member?.memberId) return;
+    setCheckingMemberId(true);
+    checkMemberIdDebounceRef.current = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/vet-members/check-id?memberId=${encodeURIComponent(value.trim())}`);
+        const data = await res.json();
+        if (data.exists) {
+          setMemberIdError(`Member ID "${value.trim()}" is already in use`);
+        }
+      } catch {} finally {
+        setCheckingMemberId(false);
+      }
+    }, 500);
+  };
+
   const handleSave = async () => {
+    if (memberIdError) {
+      setError("Please fix the Member ID error before saving.");
+      return;
+    }
+    if (!editData.memberId.trim()) {
+      setError("Member ID is required.");
+      return;
+    }
     setProcessing(true);
     setError("");
 
@@ -319,6 +354,32 @@ export default function MemberDetailPage({
                 Edit Member Information
               </h2>
               <div className="grid md:grid-cols-2 gap-4">
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Member ID Number / ژمارەی ئەندامێتی
+                  </label>
+                  <input
+                    type="text"
+                    value={editData.memberId}
+                    onChange={(e) => handleMemberIdChange(e.target.value)}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent ${
+                      memberIdError
+                        ? "border-red-400 focus:ring-red-500"
+                        : editData.memberId.trim() && editData.memberId.trim() !== member?.memberId && !checkingMemberId
+                        ? "border-green-400 focus:ring-green-500"
+                        : "border-gray-300 focus:ring-emerald-500"
+                    }`}
+                  />
+                  {checkingMemberId && (
+                    <p className="text-xs text-gray-400 mt-1">Checking availability...</p>
+                  )}
+                  {memberIdError && (
+                    <p className="text-xs text-red-600 mt-1">{memberIdError}</p>
+                  )}
+                  {editData.memberId.trim() && editData.memberId.trim() !== member?.memberId && !memberIdError && !checkingMemberId && (
+                    <p className="text-xs text-green-600 mt-1">Member ID is available</p>
+                  )}
+                </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Full Name (English)
