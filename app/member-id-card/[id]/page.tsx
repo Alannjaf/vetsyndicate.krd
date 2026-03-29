@@ -24,6 +24,19 @@ interface MemberData {
 const CARD_WIDTH = 428;
 const CARD_HEIGHT = 270;
 
+/** Auto-scale English name font size to fit within available width */
+function getEnglishNameFontSize(name: string): number {
+  const fullText = `Dr. ${name}`;
+  const maxWidth = 283; // 428 - 130 (left) - 15 (right)
+  const baseFontSize = 17;
+  // Approximate character width at 17px bold ≈ 9.5px
+  const estimatedWidth = fullText.length * 9.5;
+  if (estimatedWidth <= maxWidth) return baseFontSize;
+  // Scale down proportionally, with a minimum of 11px
+  const scaledSize = Math.floor(baseFontSize * (maxWidth / estimatedWidth));
+  return Math.max(scaledSize, 11);
+}
+
 export default function MemberIdCardPage() {
   const params = useParams();
   const [member, setMember] = useState<MemberData | null>(null);
@@ -261,7 +274,7 @@ export default function MemberIdCardPage() {
               دکتۆر {member.fullNameKu}
             </div>
 
-            {/* English name */}
+            {/* English name — auto-scales font for long names */}
             <div
               style={{
                 position: "absolute",
@@ -269,10 +282,12 @@ export default function MemberIdCardPage() {
                 left: "130px",
                 right: "15px",
                 textAlign: "right",
-                fontSize: "17px",
+                fontSize: `${getEnglishNameFontSize(member.fullNameEn)}px`,
                 fontWeight: "bold",
                 color: "#1a1a1a",
                 lineHeight: "1.3",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
               }}
             >
               Dr. {member.fullNameEn}
